@@ -4,11 +4,11 @@ const categorySchema = new Schema ({
         type:String,
         required:true
     },
-    createdBy:{
+   createdBy:{
         type:Types.ObjectId,
         ref:'User',
         required:true
-    },
+    }, 
     slug:{
         type:String,
         required:true

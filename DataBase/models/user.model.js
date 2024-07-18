@@ -1,6 +1,6 @@
 import {model , Schema , Types} from 'mongoose'
 const userSchema = new Schema ({
-    name:{
+    userName:{
         type:String,
         required:true,
     },
@@ -12,6 +12,7 @@ const userSchema = new Schema ({
     password:{
         type:String,
         required:true,
+        
     },
     status: {
         type: String,

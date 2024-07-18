@@ -1,5 +1,6 @@
+/*
 import { userModel } from '../../DataBase/models/user.model.js'
-import { generateToken, verifyToken } from '../utiles/tokenFunction.js'
+import { generateToken, verifyToken } from '../utiels/tokenFunction.js'
 
 export const isAuth = (roles) => {
   return async (req, res, next) => {
@@ -80,4 +81,37 @@ export const isAuth = (roles) => {
       next(new Error('catch error in auth', { cause: 500 }))
     }
   }
+
 }
+*/
+import { userModel } from '../../DataBase/models/user.model.js'
+import { generateToken, verifyToken } from '../utiels/tokenFunction.js'
+import { asyncHandler } from '../utiels/errhandelr.js';
+import { tokenModel } from '../../DataBase/models/token.model.js';
+import jwk from 'jsonwebtoken'
+ 
+export const auth = asyncHandler(async (req, res, next) => {
+  const { authorization } = req.headers;
+  console.log(authorization);
+  if (!authorization || !authorization.startsWith('loly__'))
+    return next(
+      new Error('authorization is required or in-valid Bearer Key', {
+        cause: 400,
+      })
+    );
+
+  const token = authorization.split('loly__')[1];
+  // const decoded = verifyToken(token);
+  const decoded = jwk.verify(token,' jaldjakldja');
+  if (!decoded?._id)
+    return next(new Error("in-valid token payload", { cause: 400 }));
+
+  const tokenDB = await tokenModel.findOne({ token, isValid: true });
+  if (!tokenDB) return next(new Error('token expired', { cause: 401 }));
+
+  const user = await userModel.findById(decoded._id);
+  if (!user) return next(new Error('Not register account', { cause: 401 }));
+
+  req.user = user;
+  return next();
+});
